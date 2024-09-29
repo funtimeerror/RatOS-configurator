@@ -1196,4 +1196,28 @@ const doctor = program
 		$({ verbose: true })`sudo `;
 	});
 
+const host = program.command('host').description('Commands used for managing the Operating System');
+host
+	.command('set-wifi-network')
+	.description('set the wifi network ssid and password')
+	.action(async () => {});
+
+host
+	.command('set-hostname')
+	.description('change your devices hostname')
+	.action(async () => {});
+
+const configurator = program.command('configurator').description('Commands used for managing the RatOS Configurator');
+
+configurator
+	.command('setup')
+	.description('setup the RatOS configurator')
+	.action(async () => {});
+
+configurator
+	.command('update')
+	.description('update the RatOS configurator')
+	.action(async () => {});
+
+
 await program.parseAsync();
