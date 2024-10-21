@@ -1204,8 +1204,17 @@ host
 
 host
 	.command('set-hostname')
+	.option('-n, --hostname <hostname>', 'Desired hostname')
 	.description('change your devices hostname')
-	.action(async () => {});
+	.action(async (options) => {
+		if (options.hostname) {
+			await ensureSudo();
+			$({ verbose: true })`sudo hostnamectl set-hostname ${options.hostname}`;
+			echo('Hostname has been changed, please reboot your Raspberry Pi for the change to take effect');
+		} else {
+			echo('-n or --hostname not provided');
+		}
+	});
 
 const configurator = program.command('configurator').description('Commands used for managing the RatOS Configurator');
 
