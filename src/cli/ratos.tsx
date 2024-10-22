@@ -1209,8 +1209,22 @@ host
 	.action(async (options) => {
 		if (options.hostname) {
 			await ensureSudo();
-			$({ verbose: true })`sudo hostnamectl set-hostname ${options.hostname}`;
-			echo('Hostname has been changed, please reboot your Raspberry Pi for the change to take effect');
+			const cmdSignal = createSignal<string | null>();
+			const $$ = $({
+				quiet: true,
+				log(entry) {
+					if (entry.kind === 'cmd') {
+						cmdSignal(entry.cmd);
+						getLogger().info('Running command: ' + entry.cmd);
+					}
+				},
+			});
+			const exitCode = (await $$`sudo hostnamectl set-hostname ${options.hostname}`).exitCode;
+			if (exitCode === 0) {
+				echo('Hostname has been changed, please reboot your Raspberry Pi for the change to take effect');
+			} else {
+				echo('Hostname was not changed successfully');
+			}
 		} else {
 			echo('-n or --hostname not provided');
 		}
@@ -1227,6 +1241,5 @@ configurator
 	.command('update')
 	.description('update the RatOS configurator')
 	.action(async () => {});
-
 
 await program.parseAsync();
